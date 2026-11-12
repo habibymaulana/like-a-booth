@@ -1,0 +1,10 @@
+{
+  "effects": 18,
+  "frames": 12,
+  "shuffle": "changed",
+  "simulationPermissionRequests": 0,
+  "download": "completed and named simulation",
+  "isolation": "camera starts empty; history cannot revive simulated editor; new take resets effects",
+  "responsive": "home, frames, populated simulation editor, camera: 1440/1024/768/390/320",
+  "errors": []
+}

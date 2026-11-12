@@ -1,0 +1,20 @@
+{
+  "textCases": 12,
+  "comparisons": 6,
+  "frames": [
+    "Pocket Camera",
+    "CRT Memory",
+    "Tape Monitor"
+  ],
+  "widths": [
+    1440,
+    1024,
+    768,
+    390,
+    320
+  ],
+  "aspectRatio": "preserved",
+  "customizedPreviewResult": "exact PNG match",
+  "downloads": "completed",
+  "errors": []
+}

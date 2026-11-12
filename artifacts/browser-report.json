@@ -1,0 +1,42 @@
+{
+  "homeWidths": "1440,1024,768,390,320: no overflow",
+  "demoFlow": "frame selection → editor → Comic Pop → result passed",
+  "canvas": {
+    "exports": [
+      "classic",
+      "oval",
+      "circle",
+      "arch",
+      "editorial",
+      "chrome",
+      "ribbon",
+      "flower",
+      "film",
+      "polaroid",
+      "postcard",
+      "gallery",
+      "heart-facts",
+      "serving-size",
+      "now-playing",
+      "playlist-mood",
+      "cassette-pop",
+      "pocket-camera",
+      "crt-memory",
+      "tape-monitor",
+      "midnight-monochrome",
+      "after-dark",
+      "indie-zine",
+      "sketch-pop",
+      "campus-chaos",
+      "daylight-saver",
+      "track-star",
+      "fast-lane",
+      "finish-line"
+    ],
+    "masks": "corner alpha and opaque center passed"
+  },
+  "syntheticCamera": "four countdown captures and confirmation passed using Chrome synthetic camera; physical camera unverified",
+  "routeResponsive": "frame and capture pages checked at all widths; direct editor reload safely redirects",
+  "reducedMotion": "none",
+  "errors": []
+}

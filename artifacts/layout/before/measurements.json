@@ -1,0 +1,300 @@
+[
+  {
+    "id": "classic",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "oval",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "circle",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "arch",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "editorial",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "chrome",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "ribbon",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "flower",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "film",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "polaroid",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "postcard",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "gallery",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "heart-facts",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "serving-size",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "now-playing",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "playlist-mood",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "cassette-pop",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "pocket-camera",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "crt-memory",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "tape-monitor",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "midnight-monochrome",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "after-dark",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "indie-zine",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "sketch-pop",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "campus-chaos",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "daylight-saver",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "track-star",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "fast-lane",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "finish-line",
+    "long": false,
+    "items": []
+  },
+  {
+    "id": "contact-sheet",
+    "long": false
+  },
+  {
+    "id": "classic",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "oval",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "circle",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "arch",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "editorial",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "chrome",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "ribbon",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "flower",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "film",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "polaroid",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "postcard",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "gallery",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "heart-facts",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "serving-size",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "now-playing",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "playlist-mood",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "cassette-pop",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "pocket-camera",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "crt-memory",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "tape-monitor",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "midnight-monochrome",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "after-dark",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "indie-zine",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "sketch-pop",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "campus-chaos",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "daylight-saver",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "track-star",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "fast-lane",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "finish-line",
+    "long": true,
+    "items": []
+  },
+  {
+    "id": "contact-sheet",
+    "long": true
+  }
+]

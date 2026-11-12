@@ -1,0 +1,177 @@
+{
+  "frames": [
+    {
+      "name": "Heart Facts",
+      "dimensions": [
+        600,
+        1500
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "Serving Size",
+      "dimensions": [
+        600,
+        1500
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "Now Playing",
+      "dimensions": [
+        600,
+        1500
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "Playlist Mood",
+      "dimensions": [
+        600,
+        1500
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "Cassette Pop",
+      "dimensions": [
+        600,
+        1500
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "Pocket Camera",
+      "dimensions": [
+        1000,
+        1300
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "CRT Memory",
+      "dimensions": [
+        1000,
+        1300
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "Tape Monitor",
+      "dimensions": [
+        600,
+        1500
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "Midnight Monochrome",
+      "dimensions": [
+        600,
+        1500
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "After Dark Strip",
+      "dimensions": [
+        600,
+        1500
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "Indie Zine",
+      "dimensions": [
+        1000,
+        1300
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "Sketch Pop",
+      "dimensions": [
+        600,
+        1500
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "Campus Chaos",
+      "dimensions": [
+        1000,
+        1300
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "Daylight Saver",
+      "dimensions": [
+        600,
+        1500
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "Track Star",
+      "dimensions": [
+        600,
+        1500
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "Fast Lane",
+      "dimensions": [
+        600,
+        1500
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    },
+    {
+      "name": "Finish Line",
+      "dimensions": [
+        1000,
+        1300
+      ],
+      "previewMatch": true,
+      "alpha": true,
+      "textEdit": true
+    }
+  ],
+  "errors": [],
+  "responsive": "Frame Studio and populated music editor at all five widths",
+  "download": "customized music PNG completed"
+}

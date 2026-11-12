@@ -1,0 +1,575 @@
+{
+  "flash": {
+    "samples": [
+      {
+        "ms": 20.30000001192093,
+        "opacity": 0,
+        "present": true,
+        "path": "/",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 33.30000001192093,
+        "opacity": 0.138558,
+        "present": true,
+        "path": "/",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 50.20000001788139,
+        "opacity": 0.277725,
+        "present": true,
+        "path": "/",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 66.80000001192093,
+        "opacity": 0.416058,
+        "present": true,
+        "path": "/",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 82.5,
+        "opacity": 0.555225,
+        "present": true,
+        "path": "/",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 100.10000002384186,
+        "opacity": 0.695225,
+        "present": true,
+        "path": "/",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 116.60000002384186,
+        "opacity": 0.833558,
+        "present": true,
+        "path": "/",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 133.30000001192093,
+        "opacity": 0.972725,
+        "present": true,
+        "path": "/",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 150,
+        "opacity": 1,
+        "present": true,
+        "path": "/",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 166.7000000178814,
+        "opacity": 1,
+        "present": true,
+        "path": "/",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 301,
+        "opacity": 1,
+        "present": true,
+        "path": "/frames",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 324,
+        "opacity": 0.655577,
+        "present": true,
+        "path": "/frames",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 333.10000002384186,
+        "opacity": 0.544577,
+        "present": true,
+        "path": "/frames",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 349.7000000178814,
+        "opacity": 0.48891,
+        "present": true,
+        "path": "/frames",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 365.80000001192093,
+        "opacity": 0.433577,
+        "present": true,
+        "path": "/frames",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 382.40000000596046,
+        "opacity": 0.37791,
+        "present": true,
+        "path": "/frames",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 399.7000000178814,
+        "opacity": 0.322243,
+        "present": true,
+        "path": "/frames",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 416.40000000596046,
+        "opacity": 0.266577,
+        "present": true,
+        "path": "/frames",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 433.2000000178814,
+        "opacity": 0.211243,
+        "present": true,
+        "path": "/frames",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 449.90000000596046,
+        "opacity": 0.15591,
+        "present": true,
+        "path": "/frames",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 466.10000002384186,
+        "opacity": 0.09991,
+        "present": true,
+        "path": "/frames",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 483.10000002384186,
+        "opacity": 0.0445767,
+        "present": true,
+        "path": "/frames",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 500.30000001192093,
+        "opacity": 0,
+        "present": true,
+        "path": "/frames",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "ms": 516.6000000238419,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 532.8000000119209,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 549.8000000119209,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 566.6000000238419,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 583.2000000178814,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 599.9000000059605,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 616,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 633.1000000238419,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 649.9000000059605,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 666.6000000238419,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 683.2000000178814,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 699.1000000238419,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 716.5,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 733.1000000238419,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 749.8000000119209,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 766.4000000059605,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 783.1000000238419,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 799.8000000119209,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 816.5,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 833.3000000119209,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      },
+      {
+        "ms": 850,
+        "opacity": 0,
+        "present": false,
+        "path": "/frames"
+      }
+    ],
+    "navigations": 1,
+    "cameraRequests": 0,
+    "oldGeometry": 0,
+    "screenshots": "before/after live; fade-in and peak compositor paused at 60/150ms in a separate pass",
+    "cancelled": "cleaned up; frame controls remain usable; Enter navigation works",
+    "reducedMotion": "immediate navigation, overlay removed",
+    "reducedMotionWallMs": 459
+  },
+  "frames": [
+    {
+      "id": "classic",
+      "size": "600x1500",
+      "changedPixels": 58110,
+      "previewPixelMatch": true,
+      "bytes": 147348
+    },
+    {
+      "id": "oval",
+      "size": "700x1400",
+      "changedPixels": 85956,
+      "previewPixelMatch": true,
+      "bytes": 254385
+    },
+    {
+      "id": "circle",
+      "size": "1000x1100",
+      "changedPixels": 36412,
+      "previewPixelMatch": true,
+      "bytes": 189528
+    },
+    {
+      "id": "arch",
+      "size": "900x1200",
+      "changedPixels": 74164,
+      "previewPixelMatch": true,
+      "bytes": 210186
+    },
+    {
+      "id": "editorial",
+      "size": "1000x1300",
+      "changedPixels": 71134,
+      "previewPixelMatch": true,
+      "bytes": 184332
+    },
+    {
+      "id": "chrome",
+      "size": "1100x1100",
+      "changedPixels": 522137,
+      "previewPixelMatch": true,
+      "bytes": 753807
+    },
+    {
+      "id": "ribbon",
+      "size": "650x1450",
+      "changedPixels": 155930,
+      "previewPixelMatch": true,
+      "bytes": 255504
+    },
+    {
+      "id": "flower",
+      "size": "1000x1100",
+      "changedPixels": 88706,
+      "previewPixelMatch": true,
+      "bytes": 255273
+    },
+    {
+      "id": "film",
+      "size": "650x1500",
+      "changedPixels": 61931,
+      "previewPixelMatch": true,
+      "bytes": 155871
+    },
+    {
+      "id": "polaroid",
+      "size": "1100x1200",
+      "changedPixels": 185884,
+      "previewPixelMatch": true,
+      "bytes": 286866
+    },
+    {
+      "id": "postcard",
+      "size": "1500x1000",
+      "changedPixels": 137184,
+      "previewPixelMatch": true,
+      "bytes": 218745
+    },
+    {
+      "id": "gallery",
+      "size": "1100x1300",
+      "changedPixels": 208761,
+      "previewPixelMatch": true,
+      "bytes": 272865
+    },
+    {
+      "id": "heart-facts",
+      "size": "600x1500",
+      "changedPixels": 35628,
+      "previewPixelMatch": true,
+      "bytes": 101700
+    },
+    {
+      "id": "serving-size",
+      "size": "600x1500",
+      "changedPixels": 33513,
+      "previewPixelMatch": true,
+      "bytes": 108228
+    },
+    {
+      "id": "now-playing",
+      "size": "600x1500",
+      "changedPixels": 29624,
+      "previewPixelMatch": true,
+      "bytes": 105714
+    },
+    {
+      "id": "playlist-mood",
+      "size": "600x1500",
+      "changedPixels": 559199,
+      "previewPixelMatch": true,
+      "bytes": 493635
+    },
+    {
+      "id": "cassette-pop",
+      "size": "600x1500",
+      "changedPixels": 33365,
+      "previewPixelMatch": true,
+      "bytes": 107907
+    },
+    {
+      "id": "pocket-camera",
+      "size": "1000x1300",
+      "changedPixels": 133371,
+      "previewPixelMatch": true,
+      "bytes": 118407
+    },
+    {
+      "id": "crt-memory",
+      "size": "1000x1300",
+      "changedPixels": 132722,
+      "previewPixelMatch": true,
+      "bytes": 119289
+    },
+    {
+      "id": "tape-monitor",
+      "size": "600x1640",
+      "changedPixels": 77371,
+      "previewPixelMatch": true,
+      "bytes": 126984
+    },
+    {
+      "id": "midnight-monochrome",
+      "size": "600x1500",
+      "changedPixels": 32615,
+      "previewPixelMatch": true,
+      "bytes": 129735
+    },
+    {
+      "id": "after-dark",
+      "size": "600x1500",
+      "changedPixels": 30659,
+      "previewPixelMatch": true,
+      "bytes": 138972
+    },
+    {
+      "id": "indie-zine",
+      "size": "1000x1300",
+      "changedPixels": 300187,
+      "previewPixelMatch": true,
+      "bytes": 167928
+    },
+    {
+      "id": "sketch-pop",
+      "size": "600x1500",
+      "changedPixels": 102700,
+      "previewPixelMatch": true,
+      "bytes": 175341
+    },
+    {
+      "id": "campus-chaos",
+      "size": "1000x1300",
+      "changedPixels": 144241,
+      "previewPixelMatch": true,
+      "bytes": 153210
+    },
+    {
+      "id": "daylight-saver",
+      "size": "600x1500",
+      "changedPixels": 90223,
+      "previewPixelMatch": true,
+      "bytes": 128214
+    },
+    {
+      "id": "track-star",
+      "size": "600x1500",
+      "changedPixels": 31090,
+      "previewPixelMatch": true,
+      "bytes": 104634
+    },
+    {
+      "id": "fast-lane",
+      "size": "600x1500",
+      "changedPixels": 74584,
+      "previewPixelMatch": true,
+      "bytes": 102396
+    },
+    {
+      "id": "finish-line",
+      "size": "1000x1300",
+      "changedPixels": 66081,
+      "previewPixelMatch": true,
+      "bytes": 121680
+    }
+  ],
+  "responsive": [
+    {
+      "page": "home",
+      "widths": [
+        1440,
+        1024,
+        768,
+        390,
+        320
+      ]
+    },
+    {
+      "page": "frames",
+      "widths": [
+        1440,
+        1024,
+        768,
+        390,
+        320
+      ]
+    },
+    {
+      "page": "editor",
+      "widths": [
+        1440,
+        1024,
+        768,
+        390,
+        320
+      ]
+    },
+    {
+      "page": "camera",
+      "widths": [
+        1440,
+        1024,
+        768,
+        390,
+        320
+      ]
+    }
+  ],
+  "orbit": "moving transforms and hover pause verified",
+  "editorExport": "editor canvas and result PNG data are byte-identical",
+  "download": "browser download completed",
+  "errors": [],
+  "missingResources": []
+}
