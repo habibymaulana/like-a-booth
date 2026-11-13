@@ -1,4 +1,5 @@
 import {drawMemoryFrame} from './memoryFrames';
+import {drawCustomFrame} from './customFrames';
 import {baselineText,drawText} from './artworkLayout';
 import {drawCollection} from './collections';
 import {traceShape} from './shapes';
@@ -163,7 +164,7 @@ function tape(ctx,s,index,theme){
 }
 
 export function drawDecorations(ctx,frame,opts,layer){
-  const art=frame.decorations;if(!art||opts.decorations===false)return;if(art.memory){drawMemoryFrame(ctx,frame,opts,layer);return;}if(art.expanded){drawCollection(ctx,frame,opts,layer);return;}
+  const art=frame.decorations;if(!art||opts.decorations===false)return;if(art.memory){drawMemoryFrame(ctx,frame,opts,layer);return;}if(art.custom){drawCustomFrame(ctx,frame,opts,layer);return;}if(art.expanded){drawCollection(ctx,frame,opts,layer);return;}
   const theme={...art,ink:opts.accent||art.ink};
   ctx.save();ctx.strokeStyle=theme.accent;ctx.fillStyle=theme.ink;ctx.lineWidth=1.5;
   if(layer==='background'){

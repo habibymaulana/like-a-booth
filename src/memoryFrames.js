@@ -3,8 +3,8 @@
 export const MEMORY_ASSET='/assets/frames/Kawaii%20Photobooth%20Memory%20Strip%20Template.png';
 const slots=[265,575,885,1195].map(y=>({x:68,y,w:427,h:270,shape:'rounded',rotation:0}));
 export const memoryFrames=[
- {id:'midnight-memory',name:'Midnight Memory',note:'Four moments, one special day.',bg:'#202747',ink:'#202747',variant:'midnight',branding:{x:111,y:1680,w:206,h:24},date:{x:123,y:1712,w:180,h:12}},
- {id:'daydream-memory',name:'Daydream Memory',note:'Good times, tucked into a scrapbook.',bg:'#eee7ee',ink:'#202747',variant:'daydream',branding:{x:230,y:1663,w:225,h:24},date:{x:245,y:1694,w:182,h:12}},
+ {id:'midnight-memory',name:'Midnight Memory',note:'Four moments, one special day.',bg:'#202747',ink:'#202747',variant:'midnight',releaseOrder:30,branding:{x:111,y:1680,w:206,h:24},date:{x:123,y:1712,w:180,h:12}},
+ {id:'daydream-memory',name:'Daydream Memory',note:'Good times, tucked into a scrapbook.',bg:'#eee7ee',ink:'#202747',variant:'daydream',releaseOrder:31,branding:{x:230,y:1663,w:225,h:24},date:{x:245,y:1694,w:182,h:12}},
 ].map(f=>({...f,w:543,h:1800,category:'Memory Scrapbook',collection:'MEMORY SCRAPBOOK',assetArtwork:true,palette:{paper:f.bg,ink:f.ink,accent:'#c73740'},slots:slots.map(s=>({...s})),decorations:{memory:f.variant,ink:f.ink,captionFont:'cursive',collection:'MEMORY SCRAPBOOK'},layout:{branding:f.branding,date:f.date}}));
 
 let prepared;
