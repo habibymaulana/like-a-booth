@@ -27,11 +27,21 @@ export const CUSTOM_ASSETS = {
 };
 
 // 1. About You (887x1774) - angled filmstrip
+// Coverage extends beneath the traced overlay by a few pixels to avoid seams.
 const aboutYouSlots = [
-  { x: 397, y: 312, w: 386, h: 288, shape: 'rounded', rotation: -0.076 },
-  { x: 375, y: 613, w: 384, h: 276, shape: 'rounded', rotation: -0.076 },
-  { x: 353, y: 900, w: 384, h: 274, shape: 'rounded', rotation: -0.076 },
-  { x: 331, y: 1185, w: 384, h: 310, shape: 'rounded', rotation: -0.076 },
+  { x: 400, y: 315, w: 382, h: 288, shape: 'rect', rotation: 0.065 },
+  { x: 377, y: 615, w: 382, h: 278, shape: 'rect', rotation: 0.065 },
+  { x: 355, y: 902, w: 382, h: 276, shape: 'rect', rotation: 0.065 },
+  { x: 331, y: 1188, w: 382, h: 310, shape: 'rect', rotation: 0.065 },
+];
+
+// Native 887 × 1774 source coordinates. The last contour follows the camera's
+// white sticker edge instead of cutting through its foreground illustration.
+const aboutYouOpenings = [
+  'M453 309 L746 329 Q786 332 783 371 L767 568 Q765 606 727 604 L433 583 Q396 582 398 545 L413 347 Q415 308 453 309 Z',
+  'M430 609 L724 629 Q762 632 759 670 L743 858 Q741 895 704 893 L411 873 Q373 871 376 834 L391 647 Q393 608 430 609 Z',
+  'M407 896 L700 916 Q738 919 735 957 L720 1142 Q718 1180 680 1177 L389 1157 Q351 1155 354 1117 L368 934 Q370 895 407 896 Z',
+  'M389 1183 L678 1203 C701 1204 716 1220 713 1245 L697 1456 L675 1461 L652 1464 L625 1468 L600 1473 L571 1479 L549 1485 L531 1492 L367 1482 Q327 1480 330 1443 L347 1221 C348 1197 365 1181 389 1183 Z',
 ];
 
 // 2. Cosy Micasa Cottage (941x1672) - cottage photo strip
@@ -152,41 +162,27 @@ export const customFrames = [
 // Cache for prepared overlay canvases
 const cache = new Map();
 
-// Helper to prepare About You overlay (removes fake checkerboard inside windows)
+// Preserve the complete source and remove only manually traced photo openings.
 function prepareAboutYouOverlay(img) {
-  const w = 887, h = 1774;
-  const c = canvas(w, h);
+  const c = canvas(887, 1774);
   const ctx = c.getContext('2d');
   ctx.drawImage(img, 0, 0);
-
-  const imgData = ctx.getImageData(0, 0, w, h);
-  const d = imgData.data;
-  const rot = -0.076;
-  const cos = Math.cos(-rot), sin = Math.sin(-rot);
-
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      for (const s of aboutYouSlots) {
-        const cx = s.x + s.w / 2;
-        const cy = s.y + s.h / 2;
-        const dx = x - cx;
-        const dy = y - cy;
-        const rx = dx * cos - dy * sin;
-        const ry = dx * sin + dy * cos;
-        // Inside slot rectangle with generous margin up to black border
-        if (Math.abs(rx) <= (s.w / 2 + 6) && Math.abs(ry) <= (s.h / 2 + 6)) {
-          const idx = (y * w + x) * 4;
-          const r = d[idx], g = d[idx + 1], b = d[idx + 2];
-          const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-          // Clear checkerboard pixels (light neutral), preserving dark camera body and border ink
-          if (lum > 130 && Math.abs(r - g) < 25 && Math.abs(g - b) < 25) {
-            d[idx + 3] = 0; // Transparent
-          }
-        }
-      }
+  ctx.globalCompositeOperation = 'destination-out';
+  // One native pixel of bleed removes the baked checkerboard edge antialiasing.
+  ctx.lineWidth = 2;
+  for (const path of aboutYouOpenings) {
+    const opening = new Path2D(path);
+    ctx.fill(opening);
+    ctx.stroke(opening);
+    // Slot four has a wider raster fringe at its two upper rounded corners.
+    if (path === aboutYouOpenings[3]) {
+      ctx.save();
+      ctx.beginPath(); ctx.rect(325, 1175, 395, 80); ctx.clip();
+      ctx.lineWidth = 6; ctx.stroke(opening);
+      ctx.restore();
     }
   }
-  ctx.putImageData(imgData, 0, 0);
+  ctx.globalCompositeOperation = 'source-over';
   return c;
 }
 
