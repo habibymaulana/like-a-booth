@@ -10,16 +10,27 @@ function validWebhookUrl(raw){
  }catch{/* Ignore unconfigured or invalid webhook URLs. */}
  return undefined;
 }
+function validOrigin(raw,allowLocalHttp){
+ try{
+  const u=new URL(raw);
+  const localHttp=allowLocalHttp&&u.protocol==='http:'&&(u.hostname==='127.0.0.1'||u.hostname==='localhost');
+  if((u.protocol==='https:'||localHttp)&&u.pathname==='/'&&!u.search&&!u.hash&&!u.username&&!u.password)return u.origin;
+ }catch{/* Disabled until a valid origin is provided. */}
+ return undefined;
+}
 export function configuration(env){
- let origin;try{const u=new URL(env.DELIVERY_ORIGIN);if(u.protocol==='https:'&&u.pathname==='/'&&!u.search&&!u.hash&&!u.username&&!u.password)origin=u.origin;}catch{/* Disabled until a canonical HTTPS origin is provided. */}
- const enabled=env.DELIVERY_ENABLED==='true'&&env.DELIVERY_PRIVATE_STORE_CONFIRMED==='true'&&env.DELIVERY_CLEANUP_CONFIGURED==='true'&&!!origin&&env.DELIVERY_SIGNING_SECRET?.length>=64&&env.CRON_SECRET?.length>=32&&!!env.BLOB_READ_WRITE_TOKEN&&!!env.UPSTASH_REDIS_REST_URL&&!!env.UPSTASH_REDIS_REST_TOKEN;
- const cleanupReady=env.DELIVERY_PRIVATE_STORE_CONFIRMED==='true'&&!!env.BLOB_READ_WRITE_TOKEN&&env.CRON_SECRET?.length>=32;
+ const localMode=env.DELIVERY_LOCAL_MODE==='true'&&!env.VERCEL;
+ const origin=validOrigin(env.DELIVERY_ORIGIN,localMode);
+ const storageReady=localMode||!!env.BLOB_READ_WRITE_TOKEN;
+ const limitReady=localMode||(!!env.UPSTASH_REDIS_REST_URL&&!!env.UPSTASH_REDIS_REST_TOKEN);
+ const enabled=env.DELIVERY_ENABLED==='true'&&(localMode||(env.DELIVERY_PRIVATE_STORE_CONFIRMED==='true'&&env.DELIVERY_CLEANUP_CONFIGURED==='true'))&&!!origin&&env.DELIVERY_SIGNING_SECRET?.length>=64&&env.CRON_SECRET?.length>=32&&storageReady&&limitReady;
+ const cleanupReady=(localMode||(env.DELIVERY_PRIVATE_STORE_CONFIRMED==='true'&&!!env.BLOB_READ_WRITE_TOKEN))&&env.CRON_SECRET?.length>=32;
  const n8nSecretReady=typeof env.N8N_WEBHOOK_SECRET==='string'&&env.N8N_WEBHOOK_SECRET.length>=32;
  const n8nEmailEnabled=!!(validWebhookUrl(env.N8N_EMAIL_WEBHOOK_URL)&&n8nSecretReady);
  const resendEmailEnabled=!!(env.RESEND_API_KEY&&env.RESEND_FROM);
  const emailProvider=n8nEmailEnabled?'n8n':resendEmailEnabled?'resend':null;
  const n8nLogEnabled=!!(validWebhookUrl(env.N8N_LOG_WEBHOOK_URL)&&n8nSecretReady);
- return {enabled,origin,cleanupReady:!!cleanupReady,emailEnabled:!!(enabled&&env.DELIVERY_EMAIL_ENABLED==='true'&&emailProvider),emailProvider,n8nLogEnabled};
+ return {enabled,localMode,origin,cleanupReady:!!cleanupReady,emailEnabled:!!(enabled&&env.DELIVERY_EMAIL_ENABLED==='true'&&emailProvider),emailProvider,n8nLogEnabled};
 }
 const mac=(s,key)=>createHmac('sha256',key).update(s).digest('base64url');
 export const digest=(s,key)=>mac(s,key);

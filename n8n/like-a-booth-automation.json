@@ -1,0 +1,864 @@
+{
+  "name": "Automate Like a Booth delivery, cleanup, and logging",
+  "nodes": [
+    {
+      "id": "72c009af-7457-4ed9-9e40-4e65f21d449f",
+      "name": "Webhook: send-email",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        192
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "like-a-booth/send-email",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "b76955be-98be-4e86-ba36-de6b6106aeb5"
+    },
+    {
+      "id": "9b0cbbb4-1cbc-4f14-abb7-c702515fda08",
+      "name": "Validate Email Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        192
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "email-res",
+              "name": "result",
+              "value": "={{ (() => {\n  const raw = $json.body ?? $json ?? {};\n  const body = typeof raw === \"object\" && raw !== null ? raw : {};\n  const errors = [];\n  const REQUIRED_SCHEMA = {\n    type: \"object\",\n    properties: {\n      to: { type: \"string\", pattern: \"^\\\\S+@\\\\S+\\\\.\\\\S+$\", description: \"Recipient email address\" },\n      gallery_url: { type: \"string\", pattern: \"^https?://[^/\\\\s]+/gallery#access=\", description: \"Private signed gallery URL\" },\n      expires_at: { type: \"string\", minLength: 10, description: \"ISO expiration timestamp\" },\n      mode: { type: \"string\", enum: [\"camera\", \"simulation\"], description: \"Session provenance mode\" },\n      session_id: { type: \"string\", description: \"Session identifier\" },\n      idempotency_key: { type: \"string\", description: \"Delivery idempotency key\" }\n    },\n    required: [\"to\", \"gallery_url\", \"expires_at\"],\n    additionalProperties: false\n  };\n  if (typeof body.to !== \"string\" || !/^\\S+@\\S+\\.\\S+$/.test(body.to.trim())) {\n    errors.push({ p: \"to\", m: \"Expected valid recipient email address\", d: \"Recipient email address\" });\n  }\n  if (typeof body.gallery_url !== \"string\" || !/^https?:\\/\\/[^/\\s]+\\/gallery#access=\\S+$/.test(body.gallery_url)) {\n    errors.push({ p: \"gallery_url\", m: \"Expected valid private gallery URL with #access= token\", d: \"Private signed gallery URL\" });\n  }\n  if (typeof body.expires_at !== \"string\" || body.expires_at.trim().length < 10) {\n    errors.push({ p: \"expires_at\", m: \"Expected ISO expiration timestamp string\", d: \"ISO expiration timestamp\" });\n  }\n  if (\"mode\" in body && body.mode !== undefined && [\"camera\", \"simulation\"].indexOf(body.mode) === -1) {\n    errors.push({ p: \"mode\", m: \"Must be camera or simulation\", d: \"Session provenance mode\" });\n  }\n  if (errors.length === 0) {\n    return {\n      valid: true,\n      validationError: null,\n      normalized: {\n        to: body.to.trim().toLowerCase(),\n        gallery_url: body.gallery_url.trim(),\n        expires_at: body.expires_at.trim(),\n        mode: body.mode === \"simulation\" ? \"simulation\" : \"camera\",\n        session_id: typeof body.session_id === \"string\" ? body.session_id : \"\",\n        idempotency_key: typeof body.idempotency_key === \"string\" ? body.idempotency_key : \"\"\n      }\n    };\n  }\n  const lines = errors.map(function (e) { return \"• \" + e.p + \": \" + e.m + (e.d ? \" - \" + e.d : \"\"); });\n  const details = {};\n  for (let i = 0; i < errors.length; i++) {\n    if (!(errors[i].p in details)) details[errors[i].p] = errors[i].m;\n  }\n  return {\n    valid: false,\n    validationError: \"Validation failed (\" + errors.length + \" issue\" + (errors.length > 1 ? \"s\" : \"\") + \"):\\n\" + lines.join(\"\\n\"),\n    details: details,\n    requiredSchema: REQUIRED_SCHEMA\n  };\n})() }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "cbf9d918-c737-4c9a-b198-a1a7a93adae7",
+      "name": "Is Email Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        192
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "email-valid-check",
+              "leftValue": "={{ $(\"Validate Email Payload\").item.json.result.valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "rightValue": false
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "ad15a6c9-2680-43c5-8615-372ccd14b4d9",
+      "name": "Send Gallery Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        96
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "authentication": "oAuth2",
+        "sendTo": "={{ $(\"Validate Email Payload\").item.json.result.normalized.to }}",
+        "subject": "={{ $(\"Validate Email Payload\").item.json.result.normalized.mode === \"simulation\" ? \"Your like a booth preview artwork\" : \"Your like a booth artwork is ready\" }}",
+        "emailType": "html",
+        "message": "=<div style=\"margin:0;padding:32px 16px;background:#f4f2ee;font-family:Arial,Helvetica,sans-serif;color:#101015;\"><div style=\"max-width:560px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #dfd9cf;\"><div style=\"background:#101015;padding:32px 24px;text-align:center;\"><h1 style=\"color:#f4f2ee;font-size:28px;margin:0;letter-spacing:-0.5px;\">like a booth.</h1><p style=\"color:#b8b2a6;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:10px 0 0;\">A little you. A little art.</p></div><div style=\"padding:32px 28px;text-align:center;\"><p style=\"font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:#6c665d;margin:0 0 10px;\">{{ $(\"Validate Email Payload\").item.json.result.normalized.mode === \"simulation\" ? \"Simulation Take / Private Link\" : \"Private Gallery / 24-Hour Access\" }}</p><h2 style=\"font-size:24px;line-height:1.3;margin:0 0 14px;color:#101015;\">A moment to keep.</h2><p style=\"font-size:15px;color:#524d46;line-height:1.7;margin:0 0 24px;\">Your finished photobooth artwork is ready. Open the private gallery link below to view and download your PNG before it expires.</p><a href=\"{{ $(\"Validate Email Payload\").item.json.result.normalized.gallery_url }}\" style=\"display:inline-block;background:#101015;color:#f4f2ee;padding:14px 26px;border-radius:999px;text-decoration:none;font-size:14px;font-weight:bold;\">Open Private Artwork</a><p style=\"font-size:12px;color:#787166;line-height:1.7;margin:24px 0 0;\">Expires: {{ DateTime.fromISO($(\"Validate Email Payload\").item.json.result.normalized.expires_at).toUTC().toFormat(\"dd LLL yyyy HH:mm 'UTC'\") }}.<br/>Anyone with this link can view it. Save a copy before expiry.</p></div></div></div>",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "like a booth"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "webhookId": "e64701cb-25bd-4647-a6be-3f0c288963cb",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "id": "9c3f2474-0789-4334-8586-d8b6daaeccd3",
+      "name": "Respond 200 Email",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        0
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"sent\", \"provider\": \"gmail\", \"message_id\": $(\"Send Gallery Email\").item.json.id ?? null, \"thread_id\": $(\"Send Gallery Email\").item.json.threadId ?? null, \"idempotency_key\": $(\"Validate Email Payload\").item.json.result.normalized.idempotency_key } }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Cache-Control",
+                "value": "no-store"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "b4c84b8b-3719-4684-b7df-1ba357f6888c",
+      "name": "Respond 502 Email",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        192
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"error\": \"upstream_error\", \"message\": \"Gmail delivery failed. Please try again later.\" } }}",
+        "options": {
+          "responseCode": 502,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Cache-Control",
+                "value": "no-store"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "447ffa3d-5fa0-4da2-a7bb-f379be785a32",
+      "name": "Respond 400 Email",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        288
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"error\": \"validation_error\", \"message\": $(\"Validate Email Payload\").item.json.result.validationError, \"details\": $(\"Validate Email Payload\").item.json.result.details, \"request_schema\": $(\"Validate Email Payload\").item.json.result.requiredSchema } }}",
+        "options": {
+          "responseCode": 400,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Cache-Control",
+                "value": "no-store"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "ee75b6b3-4066-41c0-88a9-2c48898160ca",
+      "name": "Webhook: activity-log",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        704
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "like-a-booth/activity-log",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "bf43a8eb-a9c2-4aee-a6a2-4e9026b43b83"
+    },
+    {
+      "id": "1deb87ed-0421-404d-865a-7159801246bd",
+      "name": "Validate Log Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        704
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "log-res",
+              "name": "result",
+              "value": "={{ (() => {\n  const raw = $json.body ?? $json ?? {};\n  const body = typeof raw === \"object\" && raw !== null ? raw : {};\n  const errors = [];\n  const ALLOWED_EVENTS = [\"session_created\", \"email_sent\", \"email_failed\", \"cleanup_completed\"];\n  const REQUIRED_SCHEMA = {\n    type: \"object\",\n    properties: {\n      event: { type: \"string\", enum: ALLOWED_EVENTS, description: \"Lifecycle event name\" },\n      status: { type: \"string\", minLength: 1, description: \"Event outcome status\" },\n      mode: { type: \"string\", description: \"camera or simulation\" },\n      sessionId: { type: \"string\", description: \"Session identifier\" },\n      recipientDomain: { type: \"string\", description: \"Email recipient domain only (no PII)\" },\n      expiresAt: { type: \"string\", description: \"ISO expiration timestamp\" },\n      removed: { type: \"number\", description: \"Removed blob count on cleanup\" },\n      examined: { type: \"number\", description: \"Examined blob count on cleanup\" },\n      timestamp: { type: \"string\", description: \"Event ISO timestamp\" }\n    },\n    required: [\"event\", \"status\"]\n  };\n  if (typeof body.event !== \"string\" || ALLOWED_EVENTS.indexOf(body.event) === -1) {\n    errors.push({ p: \"event\", m: \"Must be one of: \" + ALLOWED_EVENTS.join(\", \"), d: \"Lifecycle event name\" });\n  }\n  if (typeof body.status !== \"string\" || body.status.trim().length < 1) {\n    errors.push({ p: \"status\", m: \"Expected non-empty status string\", d: \"Event outcome status\" });\n  }\n  if (errors.length === 0) {\n    return {\n      valid: true,\n      validationError: null,\n      normalized: {\n        timestamp: typeof body.timestamp === \"string\" && body.timestamp ? body.timestamp : $now.toISO(),\n        event: body.event,\n        status: body.status.trim(),\n        mode: typeof body.mode === \"string\" ? body.mode : \"\",\n        session_id: typeof body.sessionId === \"string\" ? body.sessionId : (typeof body.session_id === \"string\" ? body.session_id : \"\"),\n        recipient_domain: typeof body.recipientDomain === \"string\" ? body.recipientDomain : (typeof body.recipient_domain === \"string\" ? body.recipient_domain : \"\"),\n        expires_at: typeof body.expiresAt === \"string\" ? body.expiresAt : (typeof body.expires_at === \"string\" ? body.expires_at : \"\"),\n        removed: typeof body.removed === \"number\" ? body.removed : \"\",\n        examined: typeof body.examined === \"number\" ? body.examined : \"\"\n      }\n    };\n  }\n  const lines = errors.map(function (e) { return \"• \" + e.p + \": \" + e.m + (e.d ? \" - \" + e.d : \"\"); });\n  const details = {};\n  for (let i = 0; i < errors.length; i++) {\n    if (!(errors[i].p in details)) details[errors[i].p] = errors[i].m;\n  }\n  return {\n    valid: false,\n    validationError: \"Validation failed (\" + errors.length + \" issue\" + (errors.length > 1 ? \"s\" : \"\") + \"):\\n\" + lines.join(\"\\n\"),\n    details: details,\n    requiredSchema: REQUIRED_SCHEMA\n  };\n})() }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "e13c7b5f-0ed2-41db-921a-84f17a1bbff6",
+      "name": "Is Log Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        704
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "log-valid-check",
+              "leftValue": "={{ $(\"Validate Log Payload\").item.json.result.valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "rightValue": false
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "e38ab876-8b08-445f-b924-4a907b1b1a28",
+      "name": "Append Activity Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        608
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1PmNabyZTsAsen7zGCVrh7T-gHTSuElc9OznCnrMzbAY",
+          "cachedResultName": "Logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PmNabyZTsAsen7zGCVrh7T-gHTSuElc9OznCnrMzbAY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PmNabyZTsAsen7zGCVrh7T-gHTSuElc9OznCnrMzbAY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "timestamp": "={{ $(\"Validate Log Payload\").item.json.result.normalized.timestamp }}",
+            "event": "={{ $(\"Validate Log Payload\").item.json.result.normalized.event }}",
+            "status": "={{ $(\"Validate Log Payload\").item.json.result.normalized.status }}",
+            "mode": "={{ $(\"Validate Log Payload\").item.json.result.normalized.mode }}",
+            "session_id": "={{ $(\"Validate Log Payload\").item.json.result.normalized.session_id }}",
+            "recipient_domain": "={{ $(\"Validate Log Payload\").item.json.result.normalized.recipient_domain }}",
+            "expires_at": "={{ $(\"Validate Log Payload\").item.json.result.normalized.expires_at }}",
+            "removed": "={{ $(\"Validate Log Payload\").item.json.result.normalized.removed }}",
+            "examined": "={{ $(\"Validate Log Payload\").item.json.result.normalized.examined }}"
+          },
+          "schema": [
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "mode",
+              "displayName": "mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "recipient_domain",
+              "displayName": "recipient_domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "expires_at",
+              "displayName": "expires_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "removed",
+              "displayName": "removed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "examined",
+              "displayName": "examined",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": true
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "id": "5d977bf2-7961-42c1-91da-0b87cb485945",
+      "name": "Respond 200 Log",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        512
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"logged\", \"event\": $(\"Validate Log Payload\").item.json.result.normalized.event } }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Cache-Control",
+                "value": "no-store"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "1fb06f2d-3718-493b-a1fa-fabd927b4fd2",
+      "name": "Respond 502 Log",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        704
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"error\": \"upstream_error\", \"message\": \"Failed to append activity log to Google Sheets.\" } }}",
+        "options": {
+          "responseCode": 502,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Cache-Control",
+                "value": "no-store"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "f86105b7-7b5d-4079-b9d4-0e0379194cdd",
+      "name": "Respond 400 Log",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        800
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"error\": \"validation_error\", \"message\": $(\"Validate Log Payload\").item.json.result.validationError, \"details\": $(\"Validate Log Payload\").item.json.result.details, \"request_schema\": $(\"Validate Log Payload\").item.json.result.requiredSchema } }}",
+        "options": {
+          "responseCode": 400,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Cache-Control",
+                "value": "no-store"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "20b9a04d-dbec-4821-93c0-d90e2f14a0b3",
+      "name": "Schedule Every Hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        1024
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1,
+              "triggerAtMinute": 5
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "81434617-19a4-48ac-a309-4531b8662a0f",
+      "name": "Call Local Cleanup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        1024
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "http://host.docker.internal:5174/api/delivery/cleanup",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpTemplatedCustomAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "63672f2a-f50d-4105-985c-43a1d433d752",
+      "name": "More Blobs Remaining?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        1024
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "more-check",
+              "leftValue": "={{ $(\"Call Local Cleanup\").item.json.more === true }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "rightValue": false
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "43335bac-d2dd-4a5d-8ff6-33d5f66d6915",
+      "name": "Notify Cleanup Backlog",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        1024
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "authentication": "oAuth2",
+        "sendTo": "technojiwa@gmail.com",
+        "subject": "[Like a Booth] Cleanup pagination backlog (more=true)",
+        "emailType": "html",
+        "message": "=<p>Hourly cleanup returned <strong>more: true</strong> (more than 5,000 objects scanned in one run).</p><p><strong>Removed:</strong> {{ $(\"Call Local Cleanup\").item.json.removed ?? 0 }}<br/><strong>Examined:</strong> {{ $(\"Call Local Cleanup\").item.json.examined ?? 0 }}</p>",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "like a booth alerts"
+        }
+      },
+      "webhookId": "366201a3-d016-437c-902d-2a7ff440328d",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "id": "0f657631-71ae-40bf-a128-0997dc121acf",
+      "name": "On Workflow Error",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1248
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "29e42574-ad62-49fb-bba7-64764140a28e",
+      "name": "Send Error Alert Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        1248
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "authentication": "oAuth2",
+        "sendTo": "technojiwa@gmail.com",
+        "subject": "=[Like a Booth] Workflow failed at {{ $(\"On Workflow Error\").item.json.execution?.lastNodeExecuted ?? \"Unknown node\" }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#f4f2ee;color:#101015;\"><div style=\"background:#ffffff;border:1px solid #d9d4cb;border-radius:12px;padding:24px;\"><p style=\"font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#9f2c2c;margin:0 0 8px;\">Like a Booth Alert</p><h2 style=\"margin:0 0 16px;\">Workflow Failure: {{ $(\"On Workflow Error\").item.json.workflow?.name ?? \"Like a Booth\" }}</h2><p style=\"margin:6px 0;\"><strong>Failed Node:</strong> {{ $(\"On Workflow Error\").item.json.execution?.lastNodeExecuted ?? \"Unknown\" }}</p><p style=\"margin:6px 0;\"><strong>Error:</strong> {{ $(\"On Workflow Error\").item.json.execution?.error?.message ?? \"No message\" }}</p><p style=\"margin:6px 0;\"><strong>Time (UTC):</strong> {{ $(\"On Workflow Error\").item.json.execution?.error?.timestamp ? DateTime.fromMillis($(\"On Workflow Error\").item.json.execution.error.timestamp).toISO() : $now.toISO() }}</p><p style=\"margin:18px 0 6px;\"><a href=\"{{ $(\"On Workflow Error\").item.json.execution?.url ?? \"\" }}\" style=\"display:inline-block;background:#101015;color:#ffffff;padding:10px 16px;border-radius:8px;text-decoration:none;\">Open Failed Execution</a></p></div></div>",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "like a booth alerts"
+        }
+      },
+      "webhookId": "94ce2c4c-3c94-4ae1-ac3d-046a0928d31c",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    }
+  ],
+  "connections": {
+    "Webhook: send-email": {
+      "main": [
+        [
+          {
+            "node": "Validate Email Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Email Payload": {
+      "main": [
+        [
+          {
+            "node": "Is Email Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Email Valid?": {
+      "main": [
+        [
+          {
+            "node": "Send Gallery Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 400 Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Gallery Email": {
+      "main": [
+        [
+          {
+            "node": "Respond 200 Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 502 Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook: activity-log": {
+      "main": [
+        [
+          {
+            "node": "Validate Log Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Log Payload": {
+      "main": [
+        [
+          {
+            "node": "Is Log Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Log Valid?": {
+      "main": [
+        [
+          {
+            "node": "Append Activity Row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 400 Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Activity Row": {
+      "main": [
+        [
+          {
+            "node": "Respond 200 Log",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 502 Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Every Hour": {
+      "main": [
+        [
+          {
+            "node": "Call Local Cleanup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Local Cleanup": {
+      "main": [
+        [
+          {
+            "node": "More Blobs Remaining?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "More Blobs Remaining?": {
+      "main": [
+        [
+          {
+            "node": "Notify Cleanup Backlog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On Workflow Error": {
+      "main": [
+        [
+          {
+            "node": "Send Error Alert Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timezone": "Asia/Jakarta"
+  },
+  "nodeGroups": [
+    {
+      "id": "11ba242f-f276-405b-ab58-03567de0197d",
+      "name": "Email validation & Gmail delivery",
+      "nodeNames": [
+        "Validate Email Payload",
+        "Is Email Valid?",
+        "Respond 400 Email",
+        "Send Gallery Email",
+        "Respond 200 Email",
+        "Respond 502 Email"
+      ],
+      "description": "Validates email payload, sends HTML gallery link via Gmail, and returns 200/400/502."
+    },
+    {
+      "id": "2ce621b1-b921-4eb7-83ea-4b774c26f23d",
+      "name": "Activity validation & Sheets log",
+      "nodeNames": [
+        "Validate Log Payload",
+        "Is Log Valid?",
+        "Respond 400 Log",
+        "Append Activity Row",
+        "Respond 200 Log",
+        "Respond 502 Log"
+      ],
+      "description": "Validates non-PII delivery events, appends row to Google Sheets, and returns 200/400/502."
+    },
+    {
+      "id": "f26c8e82-9711-493a-a4cf-d0e66cb4a549",
+      "name": "Hourly expired blob cleanup",
+      "nodeNames": [
+        "Call Local Cleanup",
+        "More Blobs Remaining?",
+        "Notify Cleanup Backlog"
+      ],
+      "description": "Calls local /api/delivery/cleanup hourly and alerts via Gmail if more=true backlog remains."
+    },
+    {
+      "id": "212ad66b-44dc-402d-98b9-ad0fa6c4dd98",
+      "name": "Workflow failure alert",
+      "nodeNames": [
+        "Send Error Alert Email"
+      ],
+      "description": "Sends Gmail alert with execution link if an unhandled error occurs in this workflow."
+    }
+  ],
+  "active": false
+}
