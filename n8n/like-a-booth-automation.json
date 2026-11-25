@@ -36,7 +36,7 @@
             {
               "id": "email-res",
               "name": "result",
-              "value": "={{ (() => {\n  const raw = $json.body ?? $json ?? {};\n  const body = typeof raw === \"object\" && raw !== null ? raw : {};\n  const errors = [];\n  const REQUIRED_SCHEMA = {\n    type: \"object\",\n    properties: {\n      to: { type: \"string\", pattern: \"^\\\\S+@\\\\S+\\\\.\\\\S+$\", description: \"Recipient email address\" },\n      gallery_url: { type: \"string\", pattern: \"^https?://[^/\\\\s]+/gallery#access=\", description: \"Private signed gallery URL\" },\n      expires_at: { type: \"string\", minLength: 10, description: \"ISO expiration timestamp\" },\n      mode: { type: \"string\", enum: [\"camera\", \"simulation\"], description: \"Session provenance mode\" },\n      session_id: { type: \"string\", description: \"Session identifier\" },\n      idempotency_key: { type: \"string\", description: \"Delivery idempotency key\" }\n    },\n    required: [\"to\", \"gallery_url\", \"expires_at\"],\n    additionalProperties: false\n  };\n  if (typeof body.to !== \"string\" || !/^\\S+@\\S+\\.\\S+$/.test(body.to.trim())) {\n    errors.push({ p: \"to\", m: \"Expected valid recipient email address\", d: \"Recipient email address\" });\n  }\n  if (typeof body.gallery_url !== \"string\" || !/^https?:\\/\\/[^/\\s]+\\/gallery#access=\\S+$/.test(body.gallery_url)) {\n    errors.push({ p: \"gallery_url\", m: \"Expected valid private gallery URL with #access= token\", d: \"Private signed gallery URL\" });\n  }\n  if (typeof body.expires_at !== \"string\" || body.expires_at.trim().length < 10) {\n    errors.push({ p: \"expires_at\", m: \"Expected ISO expiration timestamp string\", d: \"ISO expiration timestamp\" });\n  }\n  if (\"mode\" in body && body.mode !== undefined && [\"camera\", \"simulation\"].indexOf(body.mode) === -1) {\n    errors.push({ p: \"mode\", m: \"Must be camera or simulation\", d: \"Session provenance mode\" });\n  }\n  if (errors.length === 0) {\n    return {\n      valid: true,\n      validationError: null,\n      normalized: {\n        to: body.to.trim().toLowerCase(),\n        gallery_url: body.gallery_url.trim(),\n        expires_at: body.expires_at.trim(),\n        mode: body.mode === \"simulation\" ? \"simulation\" : \"camera\",\n        session_id: typeof body.session_id === \"string\" ? body.session_id : \"\",\n        idempotency_key: typeof body.idempotency_key === \"string\" ? body.idempotency_key : \"\"\n      }\n    };\n  }\n  const lines = errors.map(function (e) { return \"• \" + e.p + \": \" + e.m + (e.d ? \" - \" + e.d : \"\"); });\n  const details = {};\n  for (let i = 0; i < errors.length; i++) {\n    if (!(errors[i].p in details)) details[errors[i].p] = errors[i].m;\n  }\n  return {\n    valid: false,\n    validationError: \"Validation failed (\" + errors.length + \" issue\" + (errors.length > 1 ? \"s\" : \"\") + \"):\\n\" + lines.join(\"\\n\"),\n    details: details,\n    requiredSchema: REQUIRED_SCHEMA\n  };\n})() }}",
+              "value": "={{ (() => {\n  const raw = $json.body ?? $json ?? {};\n  const body = typeof raw === \"object\" && raw !== null ? raw : {};\n  const errors = [];\n  const REQUIRED_SCHEMA = {\n    type: \"object\",\n    properties: {\n      to: { type: \"string\", pattern: \"^\\\\S+@\\\\S+\\\\.\\\\S+$\", description: \"Recipient email address\" },\n      gallery_url: { type: \"string\", pattern: \"^https?://[^/\\\\s]+/gallery#access=\", description: \"Private signed gallery URL\" },\n      expires_at: { type: \"string\", minLength: 10, description: \"ISO expiration timestamp\" },\n      expires_at_ms: { type: \"number\", description: \"Unix ms expiration timestamp\" },\n      mode: { type: \"string\", enum: [\"camera\", \"simulation\"], description: \"Session provenance mode\" },\n      session_id: { type: \"string\", description: \"Session identifier\" },\n      idempotency_key: { type: \"string\", description: \"Delivery idempotency key\" }\n    },\n    required: [\"to\", \"gallery_url\", \"expires_at\"],\n    additionalProperties: false\n  };\n  if (typeof body.to !== \"string\" || !/^\\S+@\\S+\\.\\S+$/.test(body.to.trim())) {\n    errors.push({ p: \"to\", m: \"Expected valid recipient email address\", d: \"Recipient email address\" });\n  }\n  if (typeof body.gallery_url !== \"string\" || !/^https?:\\/\\/[^/\\s]+\\/gallery#access=\\S+$/.test(body.gallery_url)) {\n    errors.push({ p: \"gallery_url\", m: \"Expected valid private gallery URL with #access= token\", d: \"Private signed gallery URL\" });\n  }\n  if (typeof body.expires_at !== \"string\" || body.expires_at.trim().length < 10) {\n    errors.push({ p: \"expires_at\", m: \"Expected ISO expiration timestamp string\", d: \"ISO expiration timestamp\" });\n  }\n  if (\"mode\" in body && body.mode !== undefined && [\"camera\", \"simulation\"].indexOf(body.mode) === -1) {\n    errors.push({ p: \"mode\", m: \"Must be camera or simulation\", d: \"Session provenance mode\" });\n  }\n  if (errors.length === 0) {\n    return {\n      valid: true,\n      validationError: null,\n      normalized: {\n        to: body.to.trim().toLowerCase(),\n        gallery_url: body.gallery_url.trim(),\n        expires_at: body.expires_at.trim(),\n        mode: body.mode === \"simulation\" ? \"simulation\" : \"camera\",\n        session_id: typeof body.session_id === \"string\" ? body.session_id : \"\",\n        idempotency_key: typeof body.idempotency_key === \"string\" ? body.idempotency_key : \"\"\n      }\n    };\n  }\n  const lines = errors.map(function (e) { return \"• \" + e.p + \": \" + e.m + (e.d ? \" - \" + e.d : \"\"); });\n  const details = {};\n  for (let i = 0; i < errors.length; i++) {\n    if (!(errors[i].p in details)) details[errors[i].p] = errors[i].m;\n  }\n  return {\n    valid: false,\n    validationError: \"Validation failed (\" + errors.length + \" issue\" + (errors.length > 1 ? \"s\" : \"\") + \"):\\n\" + lines.join(\"\\n\"),\n    details: details,\n    requiredSchema: REQUIRED_SCHEMA\n  };\n})() }}",
               "type": "object"
             }
           ]
@@ -103,8 +103,8 @@
       "onError": "continueErrorOutput",
       "webhookId": "e64701cb-25bd-4647-a6be-3f0c288963cb",
       "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 5000
+      "maxTries": 2,
+      "waitBetweenTries": 2500
     },
     {
       "id": "9c3f2474-0789-4334-8586-d8b6daaeccd3",
@@ -537,7 +537,7 @@
           ]
         },
         "options": {
-          "timeout": 10000,
+          "timeout": 25000,
           "response": {
             "response": {
               "responseFormat": "json"
@@ -545,7 +545,9 @@
           }
         }
       },
-      "onError": "continueRegularOutput"
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "id": "63672f2a-f50d-4105-985c-43a1d433d752",

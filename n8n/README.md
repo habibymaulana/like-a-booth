@@ -22,4 +22,4 @@ Single unified workflow matching `Automate Like a Booth delivery, cleanup, and l
    cd /Users/apple/like-a-booth
    npm run dev:local
    ```
-   Open `http://127.0.0.1:5174` (or `http://localhost:5174`).
+   Open `http://127.0.0.1:5174` (must match `DELIVERY_ORIGIN` in `.env.local` to avoid `403 Same-origin requests required`).
