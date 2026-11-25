@@ -10,7 +10,7 @@ async function postN8nWebhook(url,secret,payload,{idempotencyKey,timeoutMs=15000
 async function sendViaN8n(env,{to,url,expiresAt,mode='camera',sessionId='',idempotencyKey}){
  const timeoutMs=Number(env.N8N_EMAIL_TIMEOUT_MS)>0?Number(env.N8N_EMAIL_TIMEOUT_MS):15000;
  const response=await postN8nWebhook(env.N8N_EMAIL_WEBHOOK_URL,env.N8N_WEBHOOK_SECRET,{to,gallery_url:url,expires_at:new Date(expiresAt).toISOString(),expires_at_ms:expiresAt,mode,session_id:sessionId,idempotency_key:idempotencyKey},{idempotencyKey,timeoutMs});
- if(!response.ok)throw Error('Email workflow rejected the request');
+ if(!response.ok)throw Error(`Email workflow rejected the request (${response.status})`);
  const raw=await response.json();const data=Array.isArray(raw)&&raw.length===1?raw[0]:raw;
  if(data?.status!=='sent'&&data?.accepted!==true)throw Error('Email workflow did not confirm delivery');
 }
@@ -60,7 +60,7 @@ export function adapters(env){
   // Atomic increment + expiry, shared by every instance. Fail closed on outage.
   const script="local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('EXPIRE',KEYS[1],ARGV[1]) end; return n";
   const response=await fetch(env.UPSTASH_REDIS_REST_URL,{method:'POST',headers:{Authorization:`Bearer ${env.UPSTASH_REDIS_REST_TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify(['EVAL',script,1,`lab-delivery:${key}`,seconds]),signal:AbortSignal.timeout(5000)});
-  if(!response.ok)throw Error('Rate limit service unavailable');const data=await response.json();if(data.error||!Number.isInteger(data.result))throw Error('Invalid rate limit response');return data.result<=max;
+  if(!response.ok)throw Error(`Rate limit service unavailable (${response.status})`);const data=await response.json();if(data.error||!Number.isInteger(data.result))throw Error(`Invalid rate limit response (${data.error||'bad_result'})`);return data.result<=max;
  };
  return {
   store,

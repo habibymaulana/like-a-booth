@@ -25,5 +25,5 @@ export function createHandler(deps){return async(req,res)=>{
   if(action==='artwork'){const result=await service.read(token);res.statusCode=200;res.setHeader('Content-Type','image/png');res.setHeader('Content-Disposition','inline; filename="like-a-booth.png"');res.setHeader('X-Session-Expires',String(result.expiresAt));res.setHeader('X-Session-Mode',result.mode);return res.end(result.data);}
   if(action==='email'){if(req.headers['content-type']!=='application/json')throw new DeliveryError(415,'JSON content type required.');let payload;try{payload=JSON.parse((await body(req,2048)).toString());}catch(error){if(error.status)throw error;throw new DeliveryError(400,'Invalid request.');}return json(res,202,await service.email(token,payload.email,ip,payload.consent));}
   throw new DeliveryError(404,'Not found.');
- }catch(error){return json(res,error.status||503,{error:error instanceof DeliveryError?error.message:'Delivery is temporarily unavailable. Please try again.'});}
+ }catch(error){if(!(error instanceof DeliveryError))console.error('[delivery]',req.query?.action||'unknown',error?.name||'Error',String(error?.message||'unknown').replace(/https?:\/\/\S+|Bearer\s+\S+/gi,'[redacted]'));return json(res,error.status||503,{error:error instanceof DeliveryError?error.message:'Delivery is temporarily unavailable. Please try again.'});}
 };}
