@@ -1,0 +1,244 @@
+{
+  "name": "Webhook: log Like a Booth activity to Google Sheets",
+  "nodes": [
+    {
+      "id": "ec85ec34-3142-4f98-8341-7e8f539e1222",
+      "name": "Webhook: like-a-booth activity-log",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 192],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "like-a-booth/activity-log",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "58f4e9e6-e788-480f-9c3d-f08b339bdb8a"
+    },
+    {
+      "id": "e13cc3f4-c2d3-48d9-b830-db8de9469a75",
+      "name": "Validate Log Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [224, 192],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "res",
+              "name": "result",
+              "value": "={{ (() => {\n  const raw = $json.body ?? $json ?? {};\n  const body = typeof raw === \"object\" && raw !== null ? raw : {};\n  const errors = [];\n  const ALLOWED_EVENTS = [\"session_created\", \"email_sent\", \"email_failed\", \"cleanup_completed\"];\n  const REQUIRED_SCHEMA = {\n    type: \"object\",\n    properties: {\n      event: { type: \"string\", enum: ALLOWED_EVENTS, description: \"Lifecycle event name\" },\n      status: { type: \"string\", minLength: 1, description: \"Event outcome status\" },\n      mode: { type: \"string\", description: \"camera or simulation\" },\n      sessionId: { type: \"string\", description: \"Session identifier\" },\n      recipientDomain: { type: \"string\", description: \"Email recipient domain only (no PII)\" },\n      expiresAt: { type: \"string\", description: \"ISO expiration timestamp\" },\n      removed: { type: \"number\", description: \"Removed blob count on cleanup\" },\n      examined: { type: \"number\", description: \"Examined blob count on cleanup\" },\n      timestamp: { type: \"string\", description: \"Event ISO timestamp\" }\n    },\n    required: [\"event\", \"status\"]\n  };\n  if (typeof body.event !== \"string\" || ALLOWED_EVENTS.indexOf(body.event) === -1) {\n    errors.push({ p: \"event\", m: \"Must be one of: \" + ALLOWED_EVENTS.join(\", \"), d: \"Lifecycle event name\" });\n  }\n  if (typeof body.status !== \"string\" || body.status.trim().length < 1) {\n    errors.push({ p: \"status\", m: \"Expected non-empty status string\", d: \"Event outcome status\" });\n  }\n  if (errors.length === 0) {\n    return {\n      valid: true,\n      validationError: null,\n      normalized: {\n        timestamp: typeof body.timestamp === \"string\" && body.timestamp ? body.timestamp : $now.toISO(),\n        event: body.event,\n        status: body.status.trim(),\n        mode: typeof body.mode === \"string\" ? body.mode : \"\",\n        session_id: typeof body.sessionId === \"string\" ? body.sessionId : (typeof body.session_id === \"string\" ? body.session_id : \"\"),\n        recipient_domain: typeof body.recipientDomain === \"string\" ? body.recipientDomain : (typeof body.recipient_domain === \"string\" ? body.recipient_domain : \"\"),\n        expires_at: typeof body.expiresAt === \"string\" ? body.expiresAt : (typeof body.expires_at === \"string\" ? body.expires_at : \"\"),\n        removed: typeof body.removed === \"number\" ? body.removed : \"\",\n        examined: typeof body.examined === \"number\" ? body.examined : \"\"\n      }\n    };\n  }\n  const lines = errors.map(function (e) { return \"• \" + e.p + \": \" + e.m + (e.d ? \" - \" + e.d : \"\"); });\n  const details = {};\n  for (let i = 0; i < errors.length; i++) {\n    if (!(errors[i].p in details)) details[errors[i].p] = errors[i].m;\n  }\n  return {\n    valid: false,\n    validationError: \"Validation failed (\" + errors.length + \" issue\" + (errors.length > 1 ? \"s\" : \"\") + \"):\\n\" + lines.join(\"\\n\"),\n    details: details,\n    requiredSchema: REQUIRED_SCHEMA\n  };\n})() }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "aeefa7a2-049d-49b5-b972-3f1adbbbd601",
+      "name": "Is Log Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [448, 192],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "log-valid-check",
+              "leftValue": "={{ $(\"Validate Log Payload\").item.json.result.valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "rightValue": false
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "7063eb34-31fb-429a-a4eb-f5fcb5622ebb",
+      "name": "Append Activity Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [672, 96],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "Like a Booth Activity Log"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "timestamp": "={{ $(\"Validate Log Payload\").item.json.result.normalized.timestamp }}",
+            "event": "={{ $(\"Validate Log Payload\").item.json.result.normalized.event }}",
+            "status": "={{ $(\"Validate Log Payload\").item.json.result.normalized.status }}",
+            "mode": "={{ $(\"Validate Log Payload\").item.json.result.normalized.mode }}",
+            "session_id": "={{ $(\"Validate Log Payload\").item.json.result.normalized.session_id }}",
+            "recipient_domain": "={{ $(\"Validate Log Payload\").item.json.result.normalized.recipient_domain }}",
+            "expires_at": "={{ $(\"Validate Log Payload\").item.json.result.normalized.expires_at }}",
+            "removed": "={{ $(\"Validate Log Payload\").item.json.result.normalized.removed }}",
+            "examined": "={{ $(\"Validate Log Payload\").item.json.result.normalized.examined }}"
+          },
+          "schema": [
+            { "id": "timestamp", "displayName": "timestamp", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false },
+            { "id": "event", "displayName": "event", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false },
+            { "id": "status", "displayName": "status", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false },
+            { "id": "mode", "displayName": "mode", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false },
+            { "id": "session_id", "displayName": "session_id", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false },
+            { "id": "recipient_domain", "displayName": "recipient_domain", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false },
+            { "id": "expires_at", "displayName": "expires_at", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false },
+            { "id": "removed", "displayName": "removed", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false },
+            { "id": "examined", "displayName": "examined", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": true
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "id": "cffa59be-d52d-467b-a775-766b0b69e06f",
+      "name": "Respond 200 Logged",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [896, 0],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"logged\", \"event\": $(\"Validate Log Payload\").item.json.result.normalized.event } }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              { "name": "Content-Type", "value": "application/json" },
+              { "name": "Cache-Control", "value": "no-store" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "236b3af9-95ba-47c3-bad6-93b276044ed4",
+      "name": "Respond 502 Sheet Failed",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [896, 192],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"error\": \"upstream_error\", \"message\": \"Failed to append activity log to Google Sheets.\" } }}",
+        "options": {
+          "responseCode": 502,
+          "responseHeaders": {
+            "entries": [
+              { "name": "Content-Type", "value": "application/json" },
+              { "name": "Cache-Control", "value": "no-store" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "c131f731-cdbe-4234-a21d-a4c114c220c6",
+      "name": "Respond 400 Invalid Log",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [528, 480],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"error\": \"validation_error\", \"message\": $(\"Validate Log Payload\").item.json.result.validationError, \"details\": $(\"Validate Log Payload\").item.json.result.details, \"request_schema\": $(\"Validate Log Payload\").item.json.result.requiredSchema } }}",
+        "options": {
+          "responseCode": 400,
+          "responseHeaders": {
+            "entries": [
+              { "name": "Content-Type", "value": "application/json" },
+              { "name": "Cache-Control", "value": "no-store" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "ca931889-7307-4a64-8590-5b935ef95755",
+      "name": "Sticky Note 74804f9c",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-64, 96],
+      "parameters": {
+        "color": 5,
+        "content": "### Event Intake & Validation\nValidates incoming non-PII delivery events before logging.",
+        "height": 272,
+        "width": 656
+      }
+    },
+    {
+      "id": "43e2507c-20a9-4a88-b686-4463d8f3fe4b",
+      "name": "Sticky Note a772bf6f",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [624, -96],
+      "parameters": {
+        "color": 4,
+        "content": "### Google Sheets Audit Log\nAppends a row to the Logs tab and returns 200/502.",
+        "height": 464,
+        "width": 432
+      }
+    }
+  ],
+  "connections": {
+    "Webhook: like-a-booth activity-log": {
+      "main": [
+        [{ "node": "Validate Log Payload", "type": "main", "index": 0 }]
+      ]
+    },
+    "Validate Log Payload": {
+      "main": [
+        [{ "node": "Is Log Valid?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Is Log Valid?": {
+      "main": [
+        [{ "node": "Append Activity Row", "type": "main", "index": 0 }],
+        [{ "node": "Respond 400 Invalid Log", "type": "main", "index": 0 }]
+      ]
+    },
+    "Append Activity Row": {
+      "main": [
+        [{ "node": "Respond 200 Logged", "type": "main", "index": 0 }],
+        [{ "node": "Respond 502 Sheet Failed", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Jakarta"
+  },
+  "active": false
+}

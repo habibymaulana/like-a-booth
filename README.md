@@ -51,7 +51,7 @@ Demo portraits are original locally drawn illustrations generated with a seeded 
 
 Effects operate on Canvas pixel data: photographic color transforms, grayscale gradients, edge-derived sketch/ink, quantization, comic contours, halftone, selectable duotone, pixel sampling and simulated risograph registration. These are algorithmic effects, not AI facial models. Halftone density is fixed; intensity blends the processed result. Processing is bounded to 1400 pixels per source edge, yields between images, and uses a capped cache. Export compositions retain their configured dimensions. Very low-powered devices may still pause briefly during pixel processing.
 
-Camera tracks stop on route exit and camera switching. No photo uploads, analytics, cloud storage, database, login or backend. Google Fonts is the only external resource; system fallbacks work offline. Photos are not sent to the font service.
+Camera tracks stop on route exit and camera switching. Local mode does not upload photos and has no analytics or login. Optional private delivery uses explicitly enabled Vercel Functions, private Blob storage, durable rate limits and optional email; see DELIVERY.md. Google Fonts is the only external visual resource; system fallbacks work offline. Photos are not sent to the font service.
 
 ## Vercel readiness
 
@@ -87,3 +87,7 @@ node tests/layoutReview.browser.mjs
 ```
 
 The before artifacts are a preserved baseline; do not regenerate them after source changes when comparing this refinement. Final normal/long outputs live in `artifacts/layout/after/`.
+
+## Results delivery
+
+Download PNG stays primary. Share Photo shares the actual PNG using the device Web Share API, with a download fallback and no upload. An opt-in private delivery panel remains unavailable until server services, secrets and cleanup are configured. [DELIVERY.md](DELIVERY.md) contains the initial audit, minimal architecture, environment table, security/expiry behavior, test evidence and outstanding live-service checks. No services were provisioned or deployed.

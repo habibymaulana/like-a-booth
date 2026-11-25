@@ -1,0 +1,54 @@
+{
+  "name": "Notify operator on Like a Booth workflow error",
+  "nodes": [
+    {
+      "id": "ea885515-6ed1-4d72-a07c-e8d33251bae1",
+      "name": "On Workflow Error",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "parameters": {}
+    },
+    {
+      "id": "f03910ec-4883-43e0-9c96-2cbfbe8dbf16",
+      "name": "Send Error Alert Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [224, 0],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "authentication": "oAuth2",
+        "sendTo": "technojiwa@gmail.com",
+        "subject": "=[Like a Booth] Workflow failed: {{ $(\"On Workflow Error\").item.json.workflow?.name ?? \"Unknown workflow\" }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#f4f2ee;color:#101015;\"><div style=\"background:#ffffff;border:1px solid #d9d4cb;border-radius:12px;padding:24px;\"><p style=\"font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#9f2c2c;margin:0 0 8px;\">Like a Booth Alert</p><h2 style=\"margin:0 0 16px;\">Workflow Failure: {{ $(\"On Workflow Error\").item.json.workflow?.name ?? \"Unknown workflow\" }}</h2><p style=\"margin:6px 0;\"><strong>Workflow ID:</strong> {{ $(\"On Workflow Error\").item.json.workflow?.id ?? \"-\" }}</p><p style=\"margin:6px 0;\"><strong>Failed Node:</strong> {{ $(\"On Workflow Error\").item.json.execution?.lastNodeExecuted ?? \"Unknown\" }}</p><p style=\"margin:6px 0;\"><strong>Error:</strong> {{ $(\"On Workflow Error\").item.json.execution?.error?.message ?? \"No message\" }}</p><p style=\"margin:6px 0;\"><strong>Description:</strong> {{ $(\"On Workflow Error\").item.json.execution?.error?.description ?? \"-\" }}</p><p style=\"margin:6px 0;\"><strong>Time (UTC):</strong> {{ $(\"On Workflow Error\").item.json.execution?.error?.timestamp ? DateTime.fromMillis($(\"On Workflow Error\").item.json.execution.error.timestamp).toISO() : $now.toISO() }}</p><p style=\"margin:18px 0 6px;\"><a href=\"{{ $(\"On Workflow Error\").item.json.execution?.url ?? \"\" }}\" style=\"display:inline-block;background:#101015;color:#ffffff;padding:10px 16px;border-radius:8px;text-decoration:none;margin-right:8px;\">Open Failed Execution</a><a href=\"{{ ($(\"On Workflow Error\").item.json.execution?.url ?? \"\").split(\"/executions/\")[0] }}\" style=\"display:inline-block;background:#ebe6dd;color:#101015;padding:10px 16px;border-radius:8px;text-decoration:none;\">Open Workflow</a></p></div></div>",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "like a booth alerts"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    }
+  ],
+  "connections": {
+    "On Workflow Error": {
+      "main": [
+        [
+          {
+            "node": "Send Error Alert Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Jakarta"
+  },
+  "active": false
+}

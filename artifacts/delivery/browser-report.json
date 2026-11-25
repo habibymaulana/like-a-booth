@@ -1,0 +1,14 @@
+{
+  "localShare": {
+    "sameFile": true,
+    "type": "image/png",
+    "active": true,
+    "exact": true
+  },
+  "localFallback": "actual PNG download completed; cancellation handled separately",
+  "crossContext": "separate browser context opens exact uploaded PNG via signed fragment link",
+  "expiry": "24-hour link returns expired UI before cleanup; authenticated cleanup removes mock Blob bytes",
+  "email": "explicit consent; injected mail adapter receives actual private link (no real mail sent)",
+  "qr": "displayed only after successful upload; exact URL encoded by QR unit test",
+  "errors": []
+}

@@ -45,3 +45,7 @@ See [STAGE2.md](STAGE2.md) and `artifacts/stage2/report.json` for the flash and 
 ## Complete artwork layout audit
 
 Latest results and reproducible commands: [LAYOUT-REFINEMENT.md](LAYOUT-REFINEMENT.md). All 29 frames have before/after normal and long-text PNGs. The final 58-case audit has no recorded collisions. 26 unit tests, lint, build, priority responsive/editor/download checks, gallery/export equality, mask/alpha checks and synthetic-camera regression pass. Checker coverage and physical-device limitations are documented separately from verified results.
+
+## Results delivery refinement
+
+See [DELIVERY.md](DELIVERY.md) for current architecture, provider prerequisites and test evidence. Optional API endpoints are now present but cloud delivery defaults disabled; this supersedes earlier source-audit statements that no upload endpoints existed. The local share path never uploads. Real cloud storage/email/cron were not exercised; integration tests use isolated in-memory/provider fixtures. No services were provisioned, emails sent, real photos uploaded or deployment performed.

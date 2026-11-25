@@ -27,3 +27,7 @@ The original twelve layouts remain intact. `src/collections.js` adds seventeen f
 ## Canvas typography and safe areas
 
 Artwork typography uses `measureText` ink bounds for baseline alignment, bounded wrapping/font fitting and restrained ellipsis. Font readiness is shared between previews and exports. Frame metadata carries logical layout zones. Drawn text and selected foreground asset bounds feed path-aware diagnostics against the actual rotated clipping shapes. The three retro-tech layouts reserve header, numbering, bezel gutters, technical footer, waveform, controls and branding zones. See LAYOUT-REFINEMENT.md for confirmed repairs and output dimensions.
+
+## Results delivery
+
+Download PNG remains the primary cobalt action. Share Photo is secondary, using the actual local PNG. Private delivery lives in a collapsed optional panel and stays unavailable without server configuration. Upload and email have separate explicit consent controls; successful cloud responses alone enable private links and locally generated QR. Gallery links display actual authorized artwork, expiry and simulation provenance. Local-by-default privacy wording avoids promising that optional cloud copies never exist.
